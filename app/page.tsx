@@ -1,203 +1,327 @@
+'use client'
+
 import Link from 'next/link'
-import { Phone, ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion, useInView, animate } from 'framer-motion'
+import { useRef, useEffect, useState } from 'react'
+import { ChevronRight, ArrowUpRight, Phone, MessageCircle } from 'lucide-react'
 import Hero from '@/components/Hero'
 import SolutionsSection from '@/components/SolutionsSection'
+
+// ─── DATA ───────────────────────────────────────────────────────────────────
 
 const servicios = [
   {
     image: '/images/service_laser.png',
     title: 'Depilación Láser',
-    desc: 'Tecnología de última generación para una eliminación permanente del vello.',
+    desc: 'Láser diodo de 808nm para todo tipo de piel. Sin dolor, sin cicatrices, con reducción permanente desde la primera sesión.',
+    tag: 'Más popular',
+    href: '/estetica/depilacion',
+    span: 'md:col-span-3',
   },
   {
     image: '/images/service_cooltech.png',
     title: 'CoolTech',
-    desc: 'Criolipólisis no invasiva para reducir la grasa localizada sin cirugía.',
-  },
-  {
-    image: '/images/service_botox.png',
-    title: 'Toxina Botulínica',
-    desc: 'Tratamiento médico-estético para suavizar líneas de expresión.',
+    desc: 'Elimina grasa localizada sin cirugía ni anestesia. La criolipólisis más avanzada disponible en Temuco.',
+    tag: 'Sin cirugía',
+    href: '/estetica/cooltech',
+    span: 'md:col-span-2',
   },
   {
     image: '/images/service_facial.png',
     title: 'Cosmetología',
-    desc: 'Tratamientos faciales y corporales personalizados para tu piel.',
+    desc: 'Protocolos personalizados para mejorar la textura, luminosidad y salud de tu piel. Con seguimiento dermatológico.',
+    tag: 'Personalizado',
+    href: '/estetica/cosmetologia',
+    span: 'md:col-span-2',
+  },
+  {
+    image: '/images/service_botox.png',
+    title: 'Toxina Botulínica',
+    desc: 'Resultados naturales aplicados por dermatólogos, no por estéticas. Precisión clínica en cada procedimiento.',
+    tag: 'Médico',
+    href: '/dermatologia/inyeccion',
+    span: 'md:col-span-3',
   },
 ]
 
+const stats = [
+  { prefix: '', value: 6, suffix: '', label: 'Dermatólogos certificados' },
+  { prefix: '+', value: 15, suffix: '', label: 'Años en Temuco' },
+  { prefix: '+', value: 5000, suffix: '', label: 'Pacientes atendidos' },
+  { prefix: '', value: 100, suffix: '%', label: 'Respaldo clínico' },
+]
 
+const doctores = [
+  { name: 'Dr. Gastón Briceño', role: 'Médico Dermatólogo', image: '/images/team01.jpg' },
+  { name: 'Dra. Yesenia Valenzuela', role: 'Médico Dermatólogo', image: '/images/team02.jpg' },
+  { name: 'Dr. M. Á. Lassalle', role: 'Médico Dermatólogo', image: '/images/team04.jpg' },
+  { name: 'Dr. Cristian Pinto', role: 'Médico Dermatólogo', image: '/images/dr-pinto-1.jpeg' },
+  { name: 'Dra. Fernanda Sepúlveda', role: 'Médico Dermatólogo', image: '/images/fernanda2.jpg' },
+  { name: 'Dra. Isabel Herrera', role: 'Médico Dermatólogo', image: '/images/isabel2.jpg' },
+]
 
-export default async function HomePage() {
+// ─── STAT COUNTER ────────────────────────────────────────────────────────────
+
+function StatCounter({
+  value,
+  prefix,
+  suffix,
+  label,
+}: {
+  value: number
+  prefix: string
+  suffix: string
+  label: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-60px' })
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    const controls = animate(0, value, {
+      duration: 1.6,
+      ease: 'easeOut',
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [inView, value])
+
+  const formatted =
+    value >= 1000 ? display.toLocaleString('de-DE') : display.toString()
+
+  return (
+    <div ref={ref} className="flex flex-col items-center gap-1.5">
+      <span className="font-heading font-bold text-4xl md:text-5xl text-[#2a3044] tabular-nums">
+        {prefix}
+        {formatted}
+        {suffix}
+      </span>
+      <span className="text-sm text-[#2a3044]/50 text-center">{label}</span>
+    </div>
+  )
+}
+
+// ─── PAGE ────────────────────────────────────────────────────────────────────
+
+export default function HomePage() {
+  const servicesRef = useRef<HTMLElement>(null)
 
   return (
     <>
       <Hero />
 
-      {/* Servicios destacados */}
-      <section className="py-24 bg-white relative">
-        {/* Decoración de fondo opcional */}
-        <div className="absolute top-0 left-0 w-full h-[60%] bg-gray-50/50 -z-10 rounded-b-[4rem]"></div>
-
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold text-teal-primary uppercase tracking-[0.2em] mb-3">
-              Nuestros tratamientos
-            </p>
-            <h2 className="font-heading font-bold text-3xl md:text-5xl text-charcoal">
-              Servicios Destacados
-            </h2>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {servicios.map(({ image, title, desc }) => (
-              <div
-                key={title}
-                className="group bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
+      {/* ── Stats strip ── */}
+      <section className="py-14 bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
+            {stats.map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <div className="relative h-56 overflow-hidden">
-                  <div className="absolute inset-0 bg-charcoal/10 group-hover:bg-transparent transition-colors duration-300 z-10" />
+                <StatCounter {...s} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Servicios: bento editorial ── */}
+      <section ref={servicesRef} className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.7 }}
+            className="mb-12"
+          >
+            <p className="text-[11px] font-bold text-teal-primary uppercase tracking-[0.22em] mb-3">
+              Tratamientos
+            </p>
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+              <h2 className="font-heading font-semibold text-3xl md:text-4xl text-[#2a3044] max-w-sm">
+                Lo que hacemos por tu piel
+              </h2>
+              <Link
+                href="/servicios"
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2a3044]/50 hover:text-teal-primary transition-colors shrink-0"
+              >
+                Ver todos los servicios <ArrowUpRight size={14} />
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Bento grid: asimétrico 5 columnas, 2 filas */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            {servicios.map(({ image, title, desc, tag, href, span }, i) => (
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.65, delay: i * 0.08 }}
+                className={`${span} group relative h-[400px] md:h-[440px] rounded-[1.75rem] overflow-hidden cursor-pointer`}
+              >
+                <Link href={href} className="absolute inset-0 z-20" aria-label={title} />
+
+                {/* Image */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image}
+                  alt={title}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+
+                {/* Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-500" />
+
+                {/* Tag badge */}
+                <div className="absolute top-5 left-5 z-10">
+                  <span className="inline-block px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[11px] font-semibold text-[#2a3044] shadow-sm">
+                    {tag}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
+                  <h3 className="font-heading font-semibold text-xl text-white mb-2 drop-shadow-sm">
+                    {title}
+                  </h3>
+                  <p className="text-white/70 text-sm leading-relaxed max-h-0 group-hover:max-h-20 overflow-hidden transition-all duration-500 ease-out">
+                    {desc}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-3 text-white/50 group-hover:text-white/90 transition-colors duration-300">
+                    <span className="text-xs font-semibold tracking-wide uppercase">Ver tratamiento</span>
+                    <ChevronRight size={13} className="transform group-hover:translate-x-1 transition-transform duration-300" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Soluciones ── */}
+      <SolutionsSection />
+
+      {/* ── Equipo médico ── */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.7 }}
+            className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+          >
+            <div>
+              <p className="text-[11px] font-bold text-teal-primary uppercase tracking-[0.22em] mb-3">
+                Nuestro equipo
+              </p>
+              <h2 className="font-heading font-semibold text-3xl md:text-4xl text-[#2a3044]">
+                Especialistas que te atienden
+              </h2>
+            </div>
+            <Link
+              href="/doctores"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2a3044]/50 hover:text-teal-primary transition-colors shrink-0"
+            >
+              Ver equipo completo <ArrowUpRight size={14} />
+            </Link>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {doctores.map(({ name, role, image }, i) => (
+              <motion.div
+                key={name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.55, delay: i * 0.09 }}
+                className="group flex flex-col items-center text-center gap-3"
+              >
+                {/* Photo */}
+                <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image}
-                    alt={title}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                    alt={name}
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                 </div>
-                <div className="p-8 flex-1 flex flex-col bg-white relative z-20 -mt-6 mx-4 rounded-2xl shadow-sm border border-gray-50/80">
-                  <h3 className="font-heading font-bold text-lg text-charcoal mb-3">{title}</h3>
-                  <p className="text-sm text-charcoal/60 leading-relaxed mb-5 flex-1">{desc}</p>
-                  <Link href="/servicios" className="inline-flex items-center gap-2 text-teal-primary text-sm font-semibold hover:text-teal-secondary transition-colors mt-auto group/link">
-                    Conocer más <ChevronRight size={16} className="transform group-hover/link:translate-x-1 transition-transform" />
-                  </Link>
+                {/* Info */}
+                <div>
+                  <p className="font-heading font-semibold text-sm text-[#2a3044] leading-snug">{name}</p>
+                  <p className="text-[11px] text-[#2a3044]/45 mt-0.5">{role}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-
-          <div className="text-center mt-16">
-            <Link
-              href="/servicios"
-              className="inline-flex items-center px-8 py-4 rounded-full bg-charcoal text-white font-semibold hover:bg-charcoal/90 transition-colors text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transform duration-300"
-            >
-              Ver todos los servicios
-            </Link>
-          </div>
         </div>
       </section>
 
+      {/* ── CTA: Contacto ── */}
+      <section className="py-6 px-4 pb-16">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.8 }}
+            className="relative rounded-[2.5rem] overflow-hidden bg-[#2a3044] text-white"
+          >
+            {/* Background image */}
+            <div className="absolute inset-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/Fachada_w1200_1200_675.jpg"
+                alt="Dermaclinica Temuco"
+                className="w-full h-full object-cover opacity-20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#2a3044]/95 via-[#2a3044]/80 to-[#2a3044]/50" />
+            </div>
 
-
-      {/* Soluciones interactivas */}
-      <SolutionsSection />
-
-      {/* Productos Destacados */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-[#f8f9fc] rounded-[2.5rem] p-8 md:p-14 shadow-sm border border-gray-100/50">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
-              <div>
-                <p className="text-xs font-bold text-[#8ba2cd] uppercase tracking-widest mb-3">
-                  Nuestros Productos
+            <div className="relative z-10 px-10 md:px-20 py-16 md:py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-10">
+              <div className="max-w-lg">
+                <p className="text-[11px] font-bold text-teal-light uppercase tracking-[0.22em] mb-4">
+                  ¿Lista para comenzar?
                 </p>
-                <h2 className="font-heading font-bold text-3xl md:text-4xl text-[#2a3044]">
-                  Productos Destacados
+                <h2 className="font-heading font-semibold text-3xl md:text-4xl leading-snug mb-4">
+                  Cuida tu piel con el respaldo médico que merece
                 </h2>
+                <p className="text-white/60 text-sm leading-relaxed">
+                  Agenda tu consulta y recibe una evaluación personalizada con nuestro equipo
+                  de dermatólogos en Temuco. Lunes a viernes, 9:00 – 17:30 hrs.
+                </p>
               </div>
-              <div className="hidden md:flex gap-3 mt-6 md:mt-0">
-                <button className="w-11 h-11 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#8ba2cd] hover:text-teal-primary hover:border-teal-primary transition-colors">
-                  <ChevronLeft size={20} />
-                </button>
-                <button className="w-11 h-11 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#8ba2cd] hover:text-teal-primary hover:border-teal-primary transition-colors">
-                  <ChevronRight size={20} />
-                </button>
+
+              <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-stretch gap-3 shrink-0">
+                <Link
+                  href="/contacto"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white text-[#2a3044] font-semibold text-sm hover:bg-gray-50 transition-colors shadow-lg whitespace-nowrap"
+                >
+                  <Phone size={15} />
+                  Agendar consulta
+                </Link>
+                <a
+                  href="https://wa.me/56936909397"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-colors whitespace-nowrap"
+                >
+                  <MessageCircle size={15} />
+                  WhatsApp
+                </a>
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                {
-                  nombre: 'SkinCeuticals C E Ferulic',
-                  tag: 'Antioxidante',
-                  tagColor: 'bg-orange-400',
-                  precio: 'desde $149.990',
-                  imagen: '/images/ce-ferulic-skinceuticals.jpg',
-                },
-                {
-                  nombre: 'SkinCeuticals HA Intensifier',
-                  tag: 'Antiedad',
-                  tagColor: 'bg-purple-400',
-                  precio: 'desde $109.990',
-                  imagen: '/images/skinceuticals-ha-intensifier.jpg',
-                },
-                {
-                  nombre: 'Babé Hidratante Matificante',
-                  tag: 'Acné',
-                  tagColor: 'bg-teal-400',
-                  precio: 'desde $19.990',
-                  imagen: '/images/babe-hidratante-matificante-50-ml.jpg',
-                },
-              ].map((prod) => (
-                <div key={prod.nombre} className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow">
-                  {/* Header de la tarjeta */}
-                  <div className="flex justify-between items-start gap-4 mb-2">
-                    <h3 className="font-heading font-medium text-[#2a3044] text-base leading-snug">
-                      {prod.nombre}
-                    </h3>
-                    <div className="flex items-center gap-1.5 shrink-0 mt-1">
-                      <span className={`w-1.5 h-1.5 rounded-full ${prod.tagColor}`}></span>
-                      <span className="text-[11px] font-medium text-[#8ba2cd]">{prod.tag}</span>
-                    </div>
-                  </div>
-                  <p className="text-sm font-semibold text-[#2a3044] mb-8">{prod.precio}</p>
-
-                  {/* Imagen */}
-                  <div className="flex-1 flex items-center justify-center mb-8 h-48 relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={prod.imagen} alt={prod.nombre} className="max-h-full max-w-full object-contain mix-blend-multiply" />
-                  </div>
-
-                  {/* Botones */}
-                  <div className="flex gap-3 mt-auto">
-                    <button className="flex-[1.2] bg-[#8ba2cd] hover:bg-[#7289b5] text-white rounded-full py-3 px-5 text-xs font-semibold flex items-center justify-between transition-colors shadow-sm">
-                      <span>Comprar</span>
-                      <ChevronRight size={14} className="opacity-70" />
-                    </button>
-                    <button className="flex-1 bg-white border border-gray-200 hover:border-gray-300 text-charcoal/70 rounded-full py-3 px-4 text-xs font-semibold transition-colors text-center">
-                      Ver más
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Contacto */}
-      <section className="py-20 bg-teal-primary text-white text-center">
-        <div className="max-w-2xl mx-auto px-4">
-          <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4">
-            ¿Listo para empezar?
-          </h2>
-          <p className="text-white/80 mb-8 text-lg">
-            Agenda tu consulta con nuestros especialistas. Estamos en Temuco, Chile.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contacto"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-sm bg-white text-teal-primary font-semibold hover:bg-white/90 transition-colors"
-            >
-              Agenda en línea
-            </Link>
-            <a
-              href="tel:+56226565050"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-sm border border-white/40 text-white font-semibold hover:bg-white/10 transition-colors"
-            >
-              <Phone size={16} />
-              Llámanos
-            </a>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>

@@ -1,259 +1,660 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
-import { CheckCircle2, AlertTriangle, Clock, Activity, ArrowRight, ShieldCheck } from 'lucide-react'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Inyección de Toxina, Relleno y Microneedling | Dermaclinica',
-  description: 'Tratamientos avanzados de rejuvenecimiento facial y corporal: Toxina Botulínica, Ácido Hialurónico y Microneedling.',
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { CheckCircle2, Clock, ShieldCheck, AlertCircle, Phone, MessageCircle, FlaskConical, Sparkles } from 'lucide-react'
+
+// Viewport preset
+const vp = { once: true, margin: '-60px' as const }
+
+// Stagger wrappers para listas
+const listContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.075, delayChildren: 0.05 } },
+}
+const listItem = {
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.38, ease: 'easeOut' } },
+}
+
+// Stagger para grids (benefits, stats)
+const gridContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09 } },
+}
+const gridItem = {
+  hidden: { opacity: 0, scale: 0.93 },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.4, type: 'spring', stiffness: 220, damping: 20 } },
+}
+
+// ─── Sección Botox con tabs ────────────────────────────────────────────────────
+
+const botoxMedica = [
+  'Hiperhidrosis axilar, palmo-plantar y facial',
+  'Dishidrosis, Bromohidrosis, Intertrigo',
+  'Cicatrices y Piloleiomiomas',
+  'Rosácea, síndrome de Raynaud, neuralgia post-herpética',
+]
+const botoxEstetica = [
+  'Arrugas dinámicas faciales y del cuello',
+  'Contorno facial y elevación de cejas',
+]
+
+function BotoxContent() {
+  const [tab, setTab] = useState<'medica' | 'estetica'>('medica')
+  const items = tab === 'medica' ? botoxMedica : botoxEstetica
+
+  return (
+    <div className="flex flex-col gap-6">
+
+      {/* Badge + Título + Descripción */}
+      <div>
+        <motion.span
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={vp}
+          transition={{ duration: 0.45 }}
+          className="inline-block px-3.5 py-1.5 rounded-full bg-teal-primary/10 text-teal-primary text-xs font-bold tracking-wide mb-4"
+        >
+          Neuromoduladores
+        </motion.span>
+        <motion.h2
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={vp}
+          transition={{ duration: 0.55, delay: 0.08 }}
+          className="font-heading font-semibold text-3xl md:text-4xl text-[#2a3044] mb-4"
+        >
+          Toxina Botulínica
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={vp}
+          transition={{ duration: 0.55, delay: 0.16 }}
+          className="text-[#2a3044]/60 leading-relaxed text-sm"
+        >
+          Neurotoxina purificada que bloquea la señal nerviosa de forma selectiva y transitoria.
+          Cuenta con décadas de evidencia clínica tanto en medicina como en estética facial.
+        </motion.p>
+      </div>
+
+      {/* Info strip: 3 pills en una fila */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={vp}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="flex flex-wrap gap-2"
+      >
+        {[
+          { icon: <Clock size={13} className="text-teal-primary" />, label: '3 – 6 meses', sub: 'de duración' },
+          { icon: <ShieldCheck size={13} className="text-teal-primary" />, label: 'Alta seguridad', sub: 'evidencia clínica' },
+          { icon: <FlaskConical size={13} className="text-teal-primary" />, label: 'Producto biológico', sub: 'uso médico' },
+        ].map(({ icon, label, sub }) => (
+          <div key={label} className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#f7f8fc] border border-gray-100">
+            {icon}
+            <span className="text-xs font-semibold text-[#2a3044]">{label}</span>
+            <span className="text-xs text-[#2a3044]/40">· {sub}</span>
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Tabs interactivos */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={vp}
+        transition={{ duration: 0.5, delay: 0.25 }}
+      >
+        {/* Tab buttons */}
+        <div className="flex gap-1 p-1 bg-gray-100/80 rounded-xl w-fit mb-5">
+          {([
+            { key: 'medica', label: 'Dermatología Médica', icon: <FlaskConical size={13} /> },
+            { key: 'estetica', label: 'Dermoestética', icon: <Sparkles size={13} /> },
+          ] as const).map(({ key, label, icon }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`relative flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors duration-200 ${
+                tab === key
+                  ? 'text-[#2a3044]'
+                  : 'text-[#2a3044]/45 hover:text-[#2a3044]/70'
+              }`}
+            >
+              {tab === key && (
+                <motion.span
+                  layoutId="botox-tab-bg"
+                  className="absolute inset-0 bg-white rounded-lg shadow-sm"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                {icon}
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content con transición */}
+        <AnimatePresence mode="wait">
+          <motion.ul
+            key={tab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-2.5"
+          >
+            {items.map((item) => (
+              <li key={item} className="flex items-start gap-2.5 text-sm text-[#2a3044]/65">
+                <CheckCircle2 size={15} className="text-teal-primary mt-0.5 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </motion.ul>
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Contraindicaciones */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={vp}
+        transition={{ duration: 0.45, delay: 0.3 }}
+        className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50 border border-amber-100"
+      >
+        <AlertCircle size={15} className="text-amber-500 mt-0.5 shrink-0" />
+        <p className="text-xs text-amber-700/80 leading-relaxed">
+          <span className="font-bold text-amber-700">Contraindicado</span> en miastenia gravis,
+          infecciones locales, embarazo, lactancia y con aminoglucósidos, sulfato de magnesio o
+          bloqueadores de calcio.
+        </p>
+      </motion.div>
+
+    </div>
+  )
 }
 
 export default function InyeccionPage() {
+  const heroRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '22%'])
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-[#2a3044] py-24 lg:py-32 overflow-hidden">
-        {/* Background Decorative Elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-teal-primary rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-teal-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
-          <div className="absolute -bottom-8 left-20 w-[500px] h-[500px] bg-white rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
+    <div className="bg-white">
+
+      {/* ── Hero ── */}
+      <section ref={heroRef} className="relative w-full min-h-[68vh] flex items-end pb-16 md:pb-24 px-6 md:px-16 overflow-hidden">
+
+        {/* Parallax background */}
+        <motion.div style={{ y: bgY }} className="absolute inset-0 scale-[1.15]">
+          <Image
+            src="/images/bg-toxina.jpg"
+            alt="Tratamientos inyectables Dermaclinica Temuco"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="100vw"
+          />
+        </motion.div>
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/10 to-transparent" />
+
+        <div className="relative z-10 max-w-7xl mx-auto w-full text-white">
+          <div className="max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/15 mb-8"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+              <span className="text-[11px] font-medium text-white/80 tracking-wider">
+                Dermatología Médica · Estética Clínica
+              </span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.1 }}
+              className="font-heading font-semibold text-4xl md:text-5xl lg:text-[3.5rem] leading-[1.08] mb-5 tracking-tight"
+            >
+              Inyección de Toxina,<br className="hidden md:block" /> Relleno y Microneedling
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.2 }}
+              className="text-base md:text-lg text-white/65 max-w-lg leading-relaxed font-light"
+            >
+              Procedimientos mínimamente invasivos aplicados por dermatólogos certificados.
+              Sin estéticas, sin intermediarios: respaldo clínico en cada procedimiento.
+            </motion.p>
+          </div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 text-center z-10">
-          <p className="text-teal-primary font-bold tracking-widest uppercase text-sm mb-4">Tratamientos Estéticos y Médicos</p>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-6 leading-tight">
-            Inyección de Toxina, <br className="hidden md:block"/> Relleno y Microneedling
-          </h1>
-          <p className="text-gray-300 max-w-2xl mx-auto text-lg leading-relaxed">
-            Procedimientos mínimamente invasivos con los más altos estándares de seguridad y eficacia para rejuvenecer, reparar y mejorar la salud de tu piel.
-          </p>
-        </div>
+        {/* Scroll line animado */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.4, duration: 0.6 }}
+          className="absolute bottom-10 right-8 md:right-16"
+        >
+          <div className="w-px h-16 bg-white/15 relative overflow-hidden">
+            <motion.div
+              animate={{ y: ['-100%', '200%'] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.3 }}
+              className="absolute w-full h-1/2 bg-gradient-to-b from-transparent via-white/55 to-transparent"
+            />
+          </div>
+        </motion.div>
       </section>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-20 lg:py-32 space-y-32">
-        
-        {/* 1. TOXINA BOTULÍNICA */}
+      {/* ── Nav ancla sticky ── */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+        className="sticky top-20 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm"
+      >
+        <nav className="max-w-7xl mx-auto px-4 md:px-8 flex gap-1 overflow-x-auto py-3">
+          {[
+            { id: 'botox', label: 'Toxina Botulínica' },
+            { id: 'hialuronico', label: 'Ácido Hialurónico' },
+            { id: 'microneedling', label: 'Microneedling' },
+          ].map(({ id, label }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold text-[#2a3044]/55 hover:text-[#2a3044] hover:bg-gray-100 transition-colors whitespace-nowrap"
+            >
+              {label}
+            </a>
+          ))}
+        </nav>
+      </motion.div>
+
+      {/* ── Contenido ── */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-20 space-y-28">
+
+        {/* ━━━ 1. TOXINA BOTULÍNICA ━━━ */}
         <section id="botox" className="scroll-mt-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            <div className="space-y-8">
-              <div>
-                <span className="inline-block px-4 py-1.5 rounded-full bg-[#17969B]/10 text-[#17969B] text-sm font-semibold mb-4">
-                  Neuromoduladores
-                </span>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2a3044]">
-                  Toxina Botulínica (BOTOX)
-                </h2>
-              </div>
-              
-              <div className="relative w-full h-64 sm:h-80 rounded-[2rem] overflow-hidden shadow-md">
-                <Image src="/images/treatment_botox.png" alt="Tratamiento Botox" fill className="object-cover object-center" />
-              </div>
-              
-              <div className="prose prose-lg text-gray-600">
-                <p>
-                  Es un producto biológico elaborado a partir de una neurotoxina que produce la bacteria anaerobia <em>Clostridium botulinum</em>. Su principal acción es relajar la musculatura, lo que la hace útil en variados campos de la medicina.
-                </p>
-              </div>
+          <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-start">
 
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <ShieldCheck className="w-8 h-8 text-[#17969B] mb-4" />
-                  <h3 className="font-bold text-[#2a3044] mb-2">Seguridad Garantizada</h3>
-                  <p className="text-sm text-gray-600">Alta evidencia científica de eficacia y seguridad al ser aplicada por profesionales entrenados.</p>
-                </div>
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <Clock className="w-8 h-8 text-[#17969B] mb-4" />
-                  <h3 className="font-bold text-[#2a3044] mb-2">Duración (3 a 6 meses)</h3>
-                  <p className="text-sm text-gray-600">Variable según dosis y características. Atletas de alto rendimiento pueden presentar menor duración.</p>
-                </div>
-              </div>
+            {/* Imagen con zoom-reveal */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={vp}
+              transition={{ duration: 0.7 }}
+              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+            >
+              <motion.div
+                initial={{ scale: 1.07 }}
+                whileInView={{ scale: 1 }}
+                viewport={vp}
+                transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src="/images/treatment_botox.png"
+                  alt="Toxina Botulínica"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </motion.div>
+            </motion.div>
 
-              <Link href="#" className="inline-flex items-center gap-2 text-[#17969B] font-semibold hover:gap-4 transition-all duration-300">
-                VER CASOS DE BOTOX <ArrowRight size={20} />
-              </Link>
-            </div>
-
-            <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 p-8 lg:p-10">
-              <h3 className="text-xl font-bold text-[#2a3044] mb-6 flex items-center gap-3">
-                <Activity className="text-[#17969B]" /> ¿Para qué se usa?
-              </h3>
-              
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Dermatología Médica:</h4>
-                  <ul className="space-y-2 text-gray-600 text-sm">
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Trastornos de sudoración (Hiperhidrosis axilar, palmo-plantar, facial)</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Dishidrosis, Bromohidrosis, Intertrigo, Psoriasis intertriginosa</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Penfigo familiar benigno</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Cicatrices y Piloleiomiomas</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Rosácea, Sindrome de Raynaud, neuralgia post herpética</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Dermoestética:</h4>
-                  <ul className="space-y-2 text-gray-600 text-sm">
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Arrugas dinámicas faciales y del cuello</li>
-                    <li className="flex items-start gap-2"><CheckCircle2 size={16} className="text-teal-primary mt-1 shrink-0"/> Contorno facial y elevación de cejas</li>
-                  </ul>
-                </div>
-
-                <div className="pt-6 border-t border-gray-100">
-                  <h4 className="font-semibold text-red-600 mb-3 flex items-center gap-2">
-                    <AlertTriangle size={18} /> Contraindicaciones
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    No recomendado en miastenia gravis, infecciones locales, embarazo, lactancia o en uso concurrente de ciertos fármacos (aminoglucosidos, sulfato de magnesio, bloqueadores de calcio).
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* Texto — componente con tabs */}
+            <BotoxContent />
           </div>
         </section>
 
-        {/* 2. ÁCIDO HIALURÓNICO */}
-        <section id="hialuronico" className="scroll-mt-32 relative">
-          <div className="absolute inset-0 bg-gray-50 w-screen left-1/2 -translate-x-1/2 rounded-[3rem] -z-10"></div>
-          
-          <div className="py-16 grid lg:grid-cols-2 gap-16 items-center">
-            <div className="order-2 lg:order-1 bg-white rounded-[2rem] shadow-md border border-gray-100 p-8 lg:p-10">
-              <h3 className="text-xl font-bold text-[#2a3044] mb-6">Usos en Dermoestética</h3>
-              <ul className="space-y-4 text-gray-600">
-                <li className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-teal-primary/10 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} className="text-teal-primary" />
-                  </div>
-                  Devolver volumen perdido en el rostro
-                </li>
-                <li className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-teal-primary/10 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} className="text-teal-primary" />
-                  </div>
-                  Hidratar la piel, cuello y manos
-                </li>
-                <li className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-teal-primary/10 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} className="text-teal-primary" />
-                  </div>
-                  Mejorar los contornos faciales
-                </li>
-                <li className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-teal-primary/10 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} className="text-teal-primary" />
-                  </div>
-                  Perfilar la nariz y disimular ojeras
-                </li>
-                <li className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-teal-primary/10 flex items-center justify-center shrink-0">
-                    <CheckCircle2 size={16} className="text-teal-primary" />
-                  </div>
-                  Rellenar arrugas
-                </li>
-              </ul>
-            </div>
+        {/* Separador animado */}
+        <motion.hr
+          initial={{ scaleX: 0, originX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={vp}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="border-gray-100"
+        />
 
-            <div className="order-1 lg:order-2 space-y-8">
+        {/* ━━━ 2. ÁCIDO HIALURÓNICO ━━━ */}
+        <section id="hialuronico" className="scroll-mt-32">
+          <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-start">
+
+            <div className="flex flex-col gap-7">
               <div>
-                <span className="inline-block px-4 py-1.5 rounded-full bg-[#17969B]/10 text-[#17969B] text-sm font-semibold mb-4">
+                <motion.span
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.45 }}
+                  className="inline-block px-3.5 py-1.5 rounded-full bg-teal-primary/10 text-teal-primary text-xs font-bold tracking-wide mb-4"
+                >
                   Rellenos Dérmicos
-                </span>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2a3044]">
+                </motion.span>
+                <motion.h2
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.55, delay: 0.08 }}
+                  className="font-heading font-semibold text-3xl md:text-4xl text-[#2a3044] mb-4"
+                >
                   Ácido Hialurónico
-                </h2>
-              </div>
-              
-              <div className="relative w-full h-64 sm:h-80 rounded-[2rem] overflow-hidden shadow-md">
-                <Image src="/images/treatment_hialuronico.png" alt="Tratamiento Ácido Hialurónico" fill className="object-cover object-top" />
-              </div>
-
-              <div className="prose prose-lg text-gray-600">
-                <p>
-                  Sustancia viscosa que se encuentra de forma natural en articulaciones, cartílagos y piel. Cumple una función vital en la estructura, hidratación y volumen facial.
-                </p>
-                <div className="bg-white p-6 rounded-2xl border-l-4 border-teal-primary shadow-sm mt-6">
-                  <h4 className="font-bold text-gray-900 mb-2">¿Cómo se utiliza?</h4>
-                  <p className="text-sm">Se inyecta en la capa dérmica de la piel mediante una serie de pequeñas inyecciones en la zona a tratar, utilizando agujas muy finas.</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border-l-4 border-teal-primary shadow-sm mt-4">
-                  <h4 className="font-bold text-gray-900 mb-2">Duración (6 a 12 meses)</h4>
-                  <p className="text-sm">El ácido se reabsorbe gradualmente, por lo que los efectos son transitorios y reversibles. Depende del estado de la piel y zona de aplicación.</p>
-                </div>
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.55, delay: 0.16 }}
+                  className="text-[#2a3044]/60 leading-relaxed"
+                >
+                  Sustancia presente de forma natural en la piel. Cumple una función estructural clave
+                  en la hidratación y el volumen facial. Se inyecta mediante agujas muy finas, con
+                  resultados visibles, reversibles y progresivos.
+                </motion.p>
               </div>
 
-              <Link href="#" className="inline-flex items-center gap-2 text-[#17969B] font-semibold hover:gap-4 transition-all duration-300">
-                VER CASOS DE ÁCIDO HIALURÓNICO <ArrowRight size={20} />
-              </Link>
+              <motion.div
+                variants={gridContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={vp}
+                className="grid grid-cols-2 gap-3"
+              >
+                {[
+                  { icon: <Clock className="w-5 h-5 text-teal-primary mt-0.5 shrink-0" />, title: '6 – 12 meses', sub: 'Se reabsorbe gradualmente' },
+                  { icon: <ShieldCheck className="w-5 h-5 text-teal-primary mt-0.5 shrink-0" />, title: 'Reversible', sub: 'Efectos transitorios y seguros' },
+                ].map(({ icon, title, sub }) => (
+                  <motion.div
+                    key={title}
+                    variants={gridItem}
+                    whileHover={{ y: -3 }}
+                    transition={{ type: 'spring', stiffness: 350 }}
+                    className="flex items-start gap-3 p-4 rounded-2xl bg-[#f7f8fc] border border-gray-100 cursor-default"
+                  >
+                    {icon}
+                    <div>
+                      <p className="font-semibold text-[#2a3044] text-sm">{title}</p>
+                      <p className="text-xs text-[#2a3044]/50 mt-0.5 leading-relaxed">{sub}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={vp}
+                  transition={{ duration: 0.4 }}
+                  className="text-xs font-bold text-[#2a3044]/40 uppercase tracking-widest mb-4"
+                >
+                  Usos en Dermoestética
+                </motion.p>
+                <motion.ul variants={listContainer} initial="hidden" whileInView="show" viewport={vp} className="space-y-2.5">
+                  {[
+                    'Devolver volumen perdido en el rostro',
+                    'Hidratar piel, cuello y manos',
+                    'Mejorar contornos faciales',
+                    'Perfilar la nariz y disimular ojeras',
+                    'Rellenar arrugas estáticas',
+                  ].map((item) => (
+                    <motion.li key={item} variants={listItem} className="flex items-start gap-2.5 text-sm text-[#2a3044]/65">
+                      <CheckCircle2 size={15} className="text-teal-primary mt-0.5 shrink-0" />
+                      {item}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              </div>
             </div>
+
+            {/* Imagen con zoom-reveal */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={vp}
+              transition={{ duration: 0.7 }}
+              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+            >
+              <motion.div
+                initial={{ scale: 1.07 }}
+                whileInView={{ scale: 1 }}
+                viewport={vp}
+                transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src="/images/bg-facial.jpg"
+                  alt="Hidratación y volumen con ácido hialurónico"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
-        {/* 3. MICRONEEDLING */}
+        {/* Separador animado */}
+        <motion.hr
+          initial={{ scaleX: 0, originX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={vp}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="border-gray-100"
+        />
+
+        {/* ━━━ 3. MICRONEEDLING ━━━ */}
         <section id="microneedling" className="scroll-mt-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-start">
+
+            {/* Imagen con zoom-reveal */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={vp}
+              transition={{ duration: 0.7 }}
+              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+            >
+              <motion.div
+                initial={{ scale: 1.07 }}
+                whileInView={{ scale: 1 }}
+                viewport={vp}
+                transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src="/images/treatment_microneedling.png"
+                  alt="Microneedling"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </motion.div>
+            </motion.div>
+
+            <div className="flex flex-col gap-7">
               <div>
-                <span className="inline-block px-4 py-1.5 rounded-full bg-[#17969B]/10 text-[#17969B] text-sm font-semibold mb-4">
+                <motion.span
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.45 }}
+                  className="inline-block px-3.5 py-1.5 rounded-full bg-teal-primary/10 text-teal-primary text-xs font-bold tracking-wide mb-4"
+                >
                   Inducción de Colágeno
-                </span>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-[#2a3044]">
+                </motion.span>
+                <motion.h2
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.55, delay: 0.08 }}
+                  className="font-heading font-semibold text-3xl md:text-4xl text-[#2a3044] mb-4"
+                >
                   Microneedling
-                </h2>
-              </div>
-              
-              <div className="relative w-full h-64 sm:h-80 rounded-[2rem] overflow-hidden shadow-md">
-                <Image src="/images/treatment_microneedling.png" alt="Tratamiento Microneedling" fill className="object-cover object-center" />
-              </div>
-
-              <div className="prose prose-lg text-gray-600">
-                <p>
-                  También conocido como terapia de inducción de colágeno. Es una técnica mínimamente invasiva que utiliza microagujas para estimular percutáneamente la producción de colágeno tipo I.
-                </p>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <Activity className="w-8 h-8 text-[#17969B] mb-4" />
-                  <h3 className="font-bold text-[#2a3044] mb-2">¿Cómo funciona?</h3>
-                  <p className="text-sm text-gray-600">Produce un daño controlado que induce un proceso de reparación natural, y crea microcanales que facilitan la absorción de principios activos.</p>
-                </div>
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <Clock className="w-8 h-8 text-[#17969B] mb-4" />
-                  <h3 className="font-bold text-[#2a3044] mb-2">Sesiones (30-60 min)</h3>
-                  <p className="text-sm text-gray-600">Resultados visibles de inmediato. El número de sesiones varía según las necesidades específicas de cada paciente.</p>
-                </div>
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={vp}
+                  transition={{ duration: 0.55, delay: 0.16 }}
+                  className="text-[#2a3044]/60 leading-relaxed"
+                >
+                  Técnica mínimamente invasiva con microagujas que estimula la producción de colágeno tipo I.
+                  Genera un daño controlado que activa la reparación natural de la piel y crea microcanales
+                  que potencian la absorción de activos.
+                </motion.p>
               </div>
 
-              <Link href="#" className="inline-flex items-center gap-2 text-[#17969B] font-semibold hover:gap-4 transition-all duration-300">
-                VER CASOS DE MICRONEEDLING <ArrowRight size={20} />
-              </Link>
-            </div>
+              <motion.div
+                variants={gridContainer}
+                initial="hidden"
+                whileInView="show"
+                viewport={vp}
+                className="grid grid-cols-2 gap-3"
+              >
+                {[
+                  { icon: <Clock className="w-5 h-5 text-teal-primary mt-0.5 shrink-0" />, title: '30 – 60 min', sub: 'Por sesión' },
+                  { icon: <ShieldCheck className="w-5 h-5 text-teal-primary mt-0.5 shrink-0" />, title: 'Mínima invasión', sub: 'Resultados visibles de inmediato' },
+                ].map(({ icon, title, sub }) => (
+                  <motion.div
+                    key={title}
+                    variants={gridItem}
+                    whileHover={{ y: -3 }}
+                    transition={{ type: 'spring', stiffness: 350 }}
+                    className="flex items-start gap-3 p-4 rounded-2xl bg-[#f7f8fc] border border-gray-100 cursor-default"
+                  >
+                    {icon}
+                    <div>
+                      <p className="font-semibold text-[#2a3044] text-sm">{title}</p>
+                      <p className="text-xs text-[#2a3044]/50 mt-0.5 leading-relaxed">{sub}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="col-span-full mb-2">
-                <h3 className="text-xl font-bold text-[#2a3044]">Beneficios y Usos</h3>
+              <div>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={vp}
+                  transition={{ duration: 0.4 }}
+                  className="text-xs font-bold text-[#2a3044]/40 uppercase tracking-widest mb-4"
+                >
+                  Beneficios y usos
+                </motion.p>
+                <motion.div
+                  variants={gridContainer}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={vp}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  {[
+                    'Rejuvenecimiento facial',
+                    'Tratamiento anti-acné',
+                    'Cicatrices y estrías',
+                    'Contorno de ojos',
+                    'Despigmentación',
+                    'Efecto tensor',
+                  ].map((uso) => (
+                    <motion.div
+                      key={uso}
+                      variants={gridItem}
+                      whileHover={{ y: -2, backgroundColor: '#eef1f9' }}
+                      className="flex items-center gap-2.5 p-3 rounded-xl bg-[#f7f8fc] border border-gray-100"
+                    >
+                      <CheckCircle2 size={14} className="text-teal-primary shrink-0" />
+                      <span className="text-sm font-medium text-[#2a3044]/70">{uso}</span>
+                    </motion.div>
+                  ))}
+                </motion.div>
               </div>
-              {[
-                'Tratamiento rejuvenecedor (booster de vitaminas)',
-                'Tratamiento anti acné',
-                'Cicatrices y estrías',
-                'Contorno de ojos',
-                'Despigmentante',
-                'Efecto tensor'
-              ].map((uso, i) => (
-                <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 group hover:border-teal-primary transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-teal-primary/10 flex items-center justify-center group-hover:bg-teal-primary group-hover:text-white transition-colors text-teal-primary">
-                    <CheckCircle2 size={20} />
-                  </div>
-                  <span className="font-semibold text-gray-800 text-sm">{uso}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>
 
       </div>
+
+      {/* ── CTA final ── */}
+      <div className="px-4 md:px-8 pb-16">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={vp}
+            transition={{ duration: 0.8 }}
+            className="relative rounded-[2.5rem] overflow-hidden bg-[#2a3044] text-white px-10 md:px-20 py-14 md:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-primary/10 via-transparent to-transparent pointer-events-none" />
+            <div className="relative max-w-md">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={vp}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="text-[11px] font-bold text-teal-light uppercase tracking-[0.22em] mb-3"
+              >
+                ¿Te interesa algún tratamiento?
+              </motion.p>
+              <motion.h2
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={vp}
+                transition={{ duration: 0.5, delay: 0.18 }}
+                className="font-heading font-semibold text-2xl md:text-3xl leading-snug mb-3"
+              >
+                Agenda una consulta con nuestros dermatólogos
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={vp}
+                transition={{ duration: 0.5, delay: 0.25 }}
+                className="text-white/55 text-sm leading-relaxed"
+              >
+                Evaluamos tu caso de forma personalizada y te recomendamos el protocolo más adecuado.
+                Lunes a viernes, 9:00 – 17:30 hrs.
+              </motion.p>
+            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={vp}
+              transition={{ duration: 0.5, delay: 0.3, type: 'spring', stiffness: 200 }}
+              className="relative flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3 shrink-0"
+            >
+              <Link
+                href="/contacto"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white text-[#2a3044] font-semibold text-sm hover:bg-gray-50 transition-colors whitespace-nowrap shadow-md"
+              >
+                <Phone size={14} />
+                Agendar consulta
+              </Link>
+              <a
+                href="https://wa.me/56936909397"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-colors whitespace-nowrap"
+              >
+                <MessageCircle size={14} />
+                WhatsApp
+              </a>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
     </div>
   )
 }
