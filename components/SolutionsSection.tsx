@@ -61,7 +61,7 @@ export default function SolutionsSection() {
           </h2>
         </div>
 
-        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100/80 flex flex-col lg:flex-row overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100/80 flex flex-col lg:flex-row overflow-hidden">
 
           {/* Left: Tab list */}
           <div className="flex-1 p-8 md:p-12 border-b lg:border-b-0 lg:border-r border-gray-100">

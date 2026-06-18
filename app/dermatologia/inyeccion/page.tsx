@@ -165,7 +165,7 @@ function BotoxContent() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={vp}
         transition={{ duration: 0.45, delay: 0.3 }}
-        className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-50 border border-amber-100"
+        className="flex items-start gap-3 p-3.5 rounded-xl bg-amber-50 border border-amber-100"
       >
         <AlertCircle size={15} className="text-amber-500 mt-0.5 shrink-0" />
         <p className="text-xs text-amber-700/80 leading-relaxed">
@@ -294,7 +294,7 @@ export default function InyeccionPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={vp}
               transition={{ duration: 0.7 }}
-              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100"
             >
               <motion.div
                 initial={{ scale: 1.07 }}
@@ -380,7 +380,7 @@ export default function InyeccionPage() {
                     variants={gridItem}
                     whileHover={{ y: -3 }}
                     transition={{ type: 'spring', stiffness: 350 }}
-                    className="flex items-start gap-3 p-4 rounded-2xl bg-[#f7f8fc] border border-gray-100 cursor-default"
+                    className="flex items-start gap-3 p-4 rounded-xl bg-[#f7f8fc] border border-gray-100 cursor-default"
                   >
                     {icon}
                     <div>
@@ -424,7 +424,7 @@ export default function InyeccionPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={vp}
               transition={{ duration: 0.7 }}
-              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100"
             >
               <motion.div
                 initial={{ scale: 1.07 }}
@@ -464,7 +464,7 @@ export default function InyeccionPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={vp}
               transition={{ duration: 0.7 }}
-              className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-gray-100"
+              className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100"
             >
               <motion.div
                 initial={{ scale: 1.07 }}
@@ -532,7 +532,7 @@ export default function InyeccionPage() {
                     variants={gridItem}
                     whileHover={{ y: -3 }}
                     transition={{ type: 'spring', stiffness: 350 }}
-                    className="flex items-start gap-3 p-4 rounded-2xl bg-[#f7f8fc] border border-gray-100 cursor-default"
+                    className="flex items-start gap-3 p-4 rounded-xl bg-[#f7f8fc] border border-gray-100 cursor-default"
                   >
                     {icon}
                     <div>
@@ -594,7 +594,7 @@ export default function InyeccionPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={vp}
             transition={{ duration: 0.8 }}
-            className="relative rounded-[2.5rem] overflow-hidden bg-[#2a3044] text-white px-10 md:px-20 py-14 md:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8"
+            className="relative rounded-2xl overflow-hidden bg-[#2a3044] text-white px-10 md:px-20 py-14 md:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-teal-primary/10 via-transparent to-transparent pointer-events-none" />
             <div className="relative max-w-md">

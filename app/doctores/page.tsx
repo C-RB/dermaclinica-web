@@ -68,7 +68,7 @@ export default function DoctoresPage() {
         {equipo.map(({ nombre, titulo, especialidades, image }) => (
           <div
             key={nombre}
-            className="bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col overflow-hidden group hover:shadow-md transition-shadow relative pb-16"
+            className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col overflow-hidden group hover:shadow-md transition-shadow relative pb-16"
           >
             {/* Imagen superior con fondo decorativo */}
             <div className="relative h-72 bg-[#eef3fb] overflow-hidden">
@@ -102,10 +102,6 @@ export default function DoctoresPage() {
               </div>
             </div>
 
-            {/* Botón flotante (+) en la esquina inferior derecha como en la referencia */}
-            <button className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 flex items-center justify-center text-charcoal/40 hover:bg-teal-primary hover:text-white hover:border-teal-primary transition-colors z-10">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
           </div>
         ))}
       </div>
