@@ -102,7 +102,7 @@ export default function Hero() {
             className="flex flex-wrap items-center gap-3"
           >
             <Link
-              href="/contacto"
+              href="/agendar"
               className="inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-white text-charcoal font-semibold text-sm hover:bg-gray-50 transition-colors shadow-lg"
             >
               Agenda tu consulta

@@ -105,7 +105,7 @@ export default function Navbar() {
         {/* CTA escritorio */}
         <div className="hidden lg:block shrink-0">
           <Link
-            href="/contacto"
+            href="/agendar"
             className="inline-flex items-center px-6 py-2.5 rounded-full bg-[#17969B] text-white text-sm font-semibold hover:bg-[#1FB7BC] hover:-translate-y-0.5 shadow-md hover:shadow-lg transition-all duration-300"
           >
             Agenda una cita
@@ -161,7 +161,7 @@ export default function Navbar() {
             
             <div className="pt-4 mt-2">
               <Link
-                href="/contacto"
+                href="/agendar"
                 onClick={() => setOpen(false)}
                 className="block text-center px-6 py-4 rounded-xl bg-[#17969B] text-white text-base font-bold shadow-md"
               >

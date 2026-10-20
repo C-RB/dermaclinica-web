@@ -1,8 +1,8 @@
 'use client'
 
-import { motion, useScroll, useTransform, useMotionValue, animate as fmAnimate } from 'framer-motion'
-import { useRef, useState, useCallback, useEffect } from 'react'
-import { MessageCircle, Phone, CheckCircle2, Sparkles, ShieldCheck, Zap, ChevronLeft, ChevronRight, LayoutGrid } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
+import { MessageCircle, Phone, CheckCircle2, Sparkles, ShieldCheck, Zap } from 'lucide-react'
 import Link from 'next/link'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -136,54 +136,10 @@ const packs = [
   { nombre: 'Pack Novia / Quinceañera', sesiones: '6 sesiones', precio: '$198.000' },
 ]
 
-// ─── Tratamientos Carousel ────────────────────────────────────────────────────
-
-const SPRING = { type: 'spring' as const, stiffness: 260, damping: 28, mass: 0.85 }
+// ─── Tratamientos: grilla completa ────────────────────────────────────────────
 
 function TratamientosCarousel() {
-  const trackRef = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0)
-  const [current, setCurrent] = useState(0)
-  const [showAll, setShowAll] = useState(false)
-  const [paused, setPaused] = useState(false)
   const total = tratamientos.length
-
-  const getTargetX = useCallback((index: number) => {
-    const track = trackRef.current
-    if (!track) return 0
-    const card = track.children[index] as HTMLElement
-    return card ? -card.offsetLeft : 0
-  }, [])
-
-  const scrollTo = useCallback((index: number) => {
-    fmAnimate(x, getTargetX(index), SPRING)
-    setCurrent(index)
-  }, [x, getTargetX])
-
-  const pauseAndResume = useCallback(() => {
-    setPaused(true)
-    const t = setTimeout(() => setPaused(false), 6000)
-    return () => clearTimeout(t)
-  }, [])
-
-  const prev = () => { pauseAndResume(); scrollTo(Math.max(0, current - 1)) }
-  const next = () => { pauseAndResume(); scrollTo(Math.min(total - 1, current + 1)) }
-
-  // Auto-advance one by one, loops back
-  useEffect(() => {
-    if (showAll || paused) return
-    const timer = setInterval(() => {
-      setCurrent(i => {
-        const nextIdx = (i + 1) % total
-        fmAnimate(x, getTargetX(nextIdx), SPRING)
-        return nextIdx
-      })
-    }, 3500)
-    return () => clearInterval(timer)
-  }, [showAll, paused, total, x, getTargetX])
-
-  // no onScroll needed — state is always in sync
-  const onScroll = undefined
 
   return (
     <section className="py-20 bg-white">
@@ -203,92 +159,27 @@ function TratamientosCarousel() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Ver todos toggle */}
-            <button
-              onClick={() => setShowAll(v => !v)}
-              className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors duration-200 ${
-                showAll
-                  ? 'bg-teal-primary text-white border-teal-primary'
-                  : 'bg-white text-[#2a3044]/50 border-gray-200 hover:border-teal-primary/40 hover:text-teal-primary'
-              }`}
-            >
-              <LayoutGrid size={13} />
-              {showAll ? 'Ver carrusel' : 'Ver todos'}
-            </button>
-
-            {/* Prev / Next — solo en modo carrusel */}
-            {!showAll && (
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={prev}
-                  disabled={current === 0}
-                  className="w-9 h-9 flex items-center justify-center border border-gray-200 text-[#2a3044]/50 hover:text-teal-primary hover:border-teal-primary/40 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  onClick={next}
-                  disabled={current === total - 1}
-                  className="w-9 h-9 flex items-center justify-center border border-gray-200 text-[#2a3044]/50 hover:text-teal-primary hover:border-teal-primary/40 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            )}
-          </div>
+          <span className="font-heading text-sm text-[#2a3044]/40 tabular-nums shrink-0">
+            {String(total).padStart(2, '0')} tratamientos
+          </span>
         </motion.div>
 
-        {/* ── Modo GRID ── */}
-        {showAll && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            {tratamientos.map((t, i) => (
-              <TratamientoCard key={t.titulo} t={t} i={i} />
-            ))}
-          </motion.div>
-        )}
-
-        {/* ── Modo CAROUSEL ── */}
-        {!showAll && (
-          <>
-            <div className="overflow-hidden">
-              <motion.div
-                ref={trackRef}
-                style={{ x }}
-                className="flex gap-4"
-              >
-                {tratamientos.map((t, i) => (
-                  <div
-                    key={t.titulo}
-                    className="shrink-0 w-[85vw] sm:w-[calc(50%-8px)] lg:w-[calc(33.333%-11px)]"
-                  >
-                    <TratamientoCard t={t} i={i} />
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* Dots */}
-            <div className="flex items-center justify-center gap-1.5 mt-8">
-              {tratamientos.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => { pauseAndResume(); scrollTo(i) }}
-                  className={`transition-all duration-300 rounded-full ${
-                    i === current
-                      ? 'w-6 h-1.5 bg-teal-primary'
-                      : 'w-1.5 h-1.5 bg-gray-200 hover:bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </>
-        )}
+        {/* Grilla completa */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tratamientos.map((t, i) => (
+            <motion.div
+              key={t.titulo}
+              {...{
+                initial: { opacity: 0, y: 24 },
+                whileInView: { opacity: 1, y: 0 },
+                viewport: vp,
+                transition: { duration: 0.5, delay: (i % 3) * 0.08 },
+              }}
+            >
+              <TratamientoCard t={t} i={i} />
+            </motion.div>
+          ))}
+        </div>
 
       </div>
     </section>
@@ -297,13 +188,7 @@ function TratamientosCarousel() {
 
 function TratamientoCard({ t, i }: { t: typeof tratamientos[0]; i: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={vp}
-      transition={{ duration: 0.45, delay: Math.min(i * 0.06, 0.3) }}
-      className="group h-full bg-white border border-gray-100 hover:border-teal-primary/30 hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden"
-    >
+    <div className="group h-full bg-white border border-gray-100 hover:border-teal-primary/30 hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden">
       {/* Imagen */}
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -313,29 +198,29 @@ function TratamientoCard({ t, i }: { t: typeof tratamientos[0]; i: number }) {
           className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
         />
         {/* Número badge */}
-        <span className="absolute top-3 left-3 font-heading font-bold text-xs text-white bg-teal-primary/80 backdrop-blur-sm px-2.5 py-1 leading-none">
+        <span className="absolute top-4 left-4 font-heading font-bold text-xs text-white bg-teal-primary/80 backdrop-blur-sm px-2.5 py-1 leading-none">
           {String(i + 1).padStart(2, '0')}
         </span>
         {/* Chip duración */}
-        <span className="absolute top-3 right-3 text-[10px] font-medium text-white/90 bg-black/30 backdrop-blur-sm px-2 py-1 leading-none">
+        <span className="absolute top-4 right-4 text-[10px] font-medium text-white/90 bg-black/30 backdrop-blur-sm px-2 py-1 leading-none">
           {t.duracion}
         </span>
       </div>
 
       {/* Contenido */}
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-6 md:p-8 flex flex-col">
         {/* Beneficio chip */}
-        <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-teal-primary mb-2">
+        <span className="inline-block text-[10px] font-bold uppercase tracking-widest text-teal-primary mb-3">
           {t.beneficio}
         </span>
 
         {/* Título */}
-        <h3 className="font-heading font-semibold text-[#2a3044] text-base leading-snug mb-2">
+        <h3 className="font-heading font-semibold text-[#2a3044] text-xl leading-snug mb-3">
           {t.titulo}
         </h3>
 
         {/* Descripción */}
-        <p className="text-sm text-[#2a3044]/50 leading-relaxed flex-1 mb-4">
+        <p className="text-sm text-[#2a3044]/50 leading-relaxed flex-1 mb-6">
           {t.desc}
         </p>
 
@@ -350,7 +235,7 @@ function TratamientoCard({ t, i }: { t: typeof tratamientos[0]; i: number }) {
           Consultar por WhatsApp
         </a>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

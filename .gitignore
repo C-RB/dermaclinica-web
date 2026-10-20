@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scripts y datos locales (no van al repo)
+scraper_dermaclinica.py
+descargar_imagenes.py
+data/
